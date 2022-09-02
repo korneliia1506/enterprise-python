@@ -28,6 +28,16 @@ if __name__ == "__main__":
     gbp_trades = requests.post(api_url, params={"leg_ccy": "GBP"})
     print(f"Trades where leg_ccy=GBP for at least one leg: {gbp_trades.json()}")
 
+    # Query trades that have notional value greater than or equal to 200
+    api_url = "http://localhost:50301/query_by_notional"  # Port used by fastapi_blotter.py
+    filtered_by_notional_trades = requests.post(api_url, params={"min_notional": 200})
+    print(f"Trades that have notional value greater than or equal to 200: {filtered_by_notional_trades.json()}")
+
+    # Query all trades
+    api_url = "http://localhost:50301/query_by_notional"  # Port used by fastapi_blotter.py
+    filtered_by_notional_trades = requests.post(api_url, params={})
+    print(f"Trades: {filtered_by_notional_trades.json()}")
+
     # Get one specific trade
     api_url = "http://localhost:50301/get_trade"  # Port used by fastapi_blotter.py
     t3_trade = requests.post(api_url, params={"trade_id": "T003"})
