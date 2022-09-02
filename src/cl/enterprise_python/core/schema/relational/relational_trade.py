@@ -13,9 +13,7 @@
 # limitations under the License.
 
 import sqlalchemy as sa
-from cl.enterprise_python.core.schema.relational.relational_trade_key import (
-    RelationalTradeKey,
-)
+from cl.enterprise_python.core.schema.relational.relational_trade_key import RelationalTradeKey
 
 
 class RelationalTrade(RelationalTradeKey):
@@ -27,3 +25,6 @@ class RelationalTrade(RelationalTradeKey):
 
     trade_type: str = sa.Column(sa.String)
     """Trade type."""
+
+    notional: float = sa.Column(sa.Float)
+    """Notional."""
