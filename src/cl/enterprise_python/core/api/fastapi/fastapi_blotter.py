@@ -36,12 +36,14 @@ def create_trades(trade_count: int) -> List[TreeTrade]:
     # Create a list of currencies to populate swap records
     ccy_list = ["USD", "EUR", "GBP", "JPY", "NOK", "AUD", "CAD"]
     ccy_count = len(ccy_list)
+    notional_values = [100, 200, 300]
 
     # Create swap records
     swaps = [
         TreeSwap(
             trade_id=f"T{(i + 1):03}",
             trade_type="Swap",
+            notional=notional_values[i],
             legs=[
                 TreeLeg(leg_type="Fixed", leg_ccy=ccy_list[i % ccy_count]),
                 TreeLeg(leg_type="Floating", leg_ccy=ccy_list[(2 * i) % ccy_count]),
@@ -107,6 +109,23 @@ def query_trades(leg_ccy: Optional[str] = None):
         trades = TreeSwap.objects(legs__leg_ccy=leg_ccy).order_by("trade_id")
     else:
         trades = TreeSwap.objects.order_by("trade_id")
+    result = {"trades": [trade.to_json() for trade in trades]}
+    return result
+
+
+@app.post("/query_by_notional")
+def query_by_notional(min_notional: Optional[float] = None):
+    """
+    If min_notional is specified, return all trades where the notional value
+    is greater than or equal to the min_notional value, otherwise return all trades.
+    """
+
+    # If min_notional is specified, return all trades where the notional value
+    # is greater than or equal to the min_notional value, otherwise return all trades.
+    if min_notional is not None:
+        trades = TreeTrade.objects(notional__gte=200).order_by("trade_id")
+    else:
+        trades = TreeTrade.objects.order_by("trade_id")
     result = {"trades": [trade.to_json() for trade in trades]}
     return result
 
