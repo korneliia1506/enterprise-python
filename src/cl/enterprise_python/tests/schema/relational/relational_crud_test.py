@@ -78,11 +78,14 @@ class RelCrudTest:
             for i in range(0, 2)
         ]
 
+        notional_values = [100, 200, 300]
+
         # Create swap records using legs
         swaps: List[RelationalTrade] = [
             RelationalSwap(
                 trade_id=f"T{i + 1}",
                 trade_type="Swap",
+                notional=notional_values[i],
                 legs=[fixed_legs[i], floating_legs[i]],
             )
             for i in range(0, 2)
@@ -93,6 +96,7 @@ class RelCrudTest:
             RelationalBond(
                 trade_id=f"T{i + 1}",
                 trade_type="Bond",
+                notional=notional_values[i],
                 bond_ccy=ccy_list[i % ccy_count],
             )
             for i in range(2, 3)
@@ -185,6 +189,19 @@ class RelCrudTest:
                         f"leg_type[0]={trade.legs[0].leg_type} leg_ccy[0]={trade.legs[0].leg_ccy} "
                         f"leg_type[1]={trade.legs[1].leg_type} leg_ccy[1]={trade.legs[1].leg_ccy}\n"
                         for trade in gbp_fixed_swaps
+                    ]
+                )
+
+                # Retrieve trades where notional value is greater or equal to 200
+                # Must use noqa because PyCharm linter thinks does not return anything
+                filtered_by_notional_trades = list(
+                    session.query(RelationalTrade).where(RelationalTrade.notional >= 200).order_by(RelationalTrade.trade_id)
+                )  # noqa
+
+                result += "Trades where notional value is greater or equal to 200:\n" + "".join(
+                    [
+                        f"    trade_id={trade.trade_id} notional={trade.notional} "
+                        for trade in filtered_by_notional_trades
                     ]
                 )
 
