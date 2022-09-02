@@ -59,11 +59,14 @@ class TreeCrudTest:
         ccy_list = ["USD", "GBP", "JPY", "NOK", "AUD"]
         ccy_count = len(ccy_list)
 
+        notional_values = [100, 200, 300]
+
         # Create swap records
         swaps = [
             TreeSwap(
                 trade_id=f"T{i+1}",
                 trade_type="Swap",
+                notional=notional_values[i],
                 legs=[
                     TreeLeg(leg_type="Fixed", leg_ccy=ccy_list[i % ccy_count]),
                     TreeLeg(leg_type="Floating", leg_ccy="EUR"),
@@ -73,7 +76,7 @@ class TreeCrudTest:
         ]
         bonds = [
             TreeBond(
-                trade_id=f"T{i+1}", trade_type="Bond", bond_ccy=ccy_list[i % ccy_count]
+                trade_id=f"T{i+1}", trade_type="Bond", notional=notional_values[i], bond_ccy=ccy_list[i % ccy_count]
             )
             for i in range(2, 3)
         ]
@@ -147,6 +150,18 @@ class TreeCrudTest:
                 f"leg_type[0]={trade.legs[0].leg_type} leg_ccy[0]={trade.legs[0].leg_ccy} "
                 f"leg_type[1]={trade.legs[1].leg_type} leg_ccy[1]={trade.legs[1].leg_ccy}\n"
                 for trade in gbp_fixed_swaps
+            ]
+        )
+
+        # Retrieve trades where notional value is greater or equal to 200
+        # Must use noqa because PyCharm linter thinks does not return anything
+        filtered_by_notional_trades = list(TreeTrade.objects(notional__gte=200).order_by("trade_id"))
+          # noqa
+
+        result += "Trades where notional value is greater or equal to 200:\n" + "".join(
+            [
+                f"    trade_id={trade.trade_id} notional={trade.notional} "
+                for trade in filtered_by_notional_trades
             ]
         )
 
